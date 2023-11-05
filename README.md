@@ -94,3 +94,6 @@ If you have multiple URLs, you can also do:
 ## API Documentation
 
 See https://github.com/obsidianmd/obsidian-api
+
+
+https://github.com/jianzs/obsidian-qiniu-image-uploader/blob/master/src/uploader/qiniu.ts
