@@ -12,7 +12,7 @@ export class MinioUploader implements Uploader {
 
         this.minioClient = new Client({
             endPoint: settings.endPoint,
-            port: settings.port,
+            port: parseInt(settings.port),
             useSSL: settings.useSSL,
             accessKey: settings.accessKey,
             secretKey: settings.secretKey,
