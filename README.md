@@ -97,3 +97,6 @@ See https://github.com/obsidianmd/obsidian-api
 
 
 https://github.com/jianzs/obsidian-qiniu-image-uploader/blob/master/src/uploader/qiniu.ts
+
+
+本系统不处理文件存储的访问及文件可用性及备份问题。

@@ -8,7 +8,8 @@ export interface minioSettings {
   accessKey: string,
   secretKey: string,
   bucket: string,
-  namePrefix: string,
+  imagePrefix: string,
+  filePrefix: string,
   useSSL: boolean,
 }
 
@@ -17,15 +18,18 @@ export const DEFAULT_SETTINGS: ObjectManagerSettings = {
     endPoint: "192.168.66.10",
     port: 9000,
     accessKey: "xishang",
-    secretKey: "123456",
-    bucket: "picture",
-    namePrefix: "img-",
+    secretKey: "xishang",
+    bucket: "mynote",
+    imagePrefix: "img-",
+    filePrefix: "file-",
     useSSL: false,
-  }
+  },
+  imageOnly: false,
 }
 
 export interface ObjectManagerSettings {
-  minioSettings: minioSettings
+  minioSettings: minioSettings,
+  imageOnly: boolean,
 }
 
 // 创建插件的自定义配置

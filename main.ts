@@ -1,6 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings } from 'settings';
 import { Uploader, buildUploader } from 'uploader/uploader';
+import { isImage } from 'utils/file';
 
 export default class ObjectManagerPlugin extends Plugin {
     settings: ObjectManagerSettings;
@@ -13,9 +14,11 @@ export default class ObjectManagerPlugin extends Plugin {
         // 将插件的配置 tab 添加到设置菜单中
         this.addSettingTab(new ObjectManagerSettingTab(this.app, this))
 
-        this.uploader = buildUploader(this.settings);
+        this.uploader = buildUploader(this.settings)
 
+        // 处理来自剪贴板的黏贴事件
         this.registerEvent(this.app.workspace.on('editor-paste', this.customPasteEventCallback))
+        // 处理文件直接从系统拖入
         this.registerEvent(this.app.workspace.on('editor-drop', this.customDropEventListener))
     }
 
@@ -23,80 +26,96 @@ export default class ObjectManagerPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
     }
 
     async saveSettings() {
-        await this.saveData(this.settings);
+        await this.saveData(this.settings)
     }
 
     private customPasteEventCallback = async (e: ClipboardEvent) => {
-        if (!this.uploader) {
-            ObjectManagerPlugin.showUnconfiguredPluginNotice();
-            return;
-        }
         if (e.clipboardData == null || e.clipboardData.files.length === 0) {
-            return;
+            return
         }
 
-        const { files } = e.clipboardData!;
-        const uploadFile = files[0];
-        if (!uploadFile.type.startsWith('image')) {
-            return;
+        const { files } = e.clipboardData!
+
+        if (!files || files.length == 0) {
+            return
         }
+
+        const uploadFile = files[0]
 
         e.preventDefault()
-        await this.uploadFileAndEmbedImage(uploadFile);
+        await this.uploadFileAndEmbed(uploadFile)
     }
 
     private customDropEventListener = async (e: DragEvent) => {
-        if (!this.uploader) {
-            ObjectManagerPlugin.showUnconfiguredPluginNotice();
-            return;
-        }
         if (e.dataTransfer == null || e.dataTransfer.files.length === 0) {
-            return;
+            return
         }
 
         const { files } = e.dataTransfer;
-        const uploadFile = files[0];
-        if (!uploadFile.type.startsWith('image')) {
-            return;
+
+        if (!files || files.length == 0) {
+            return
         }
+
+        const uploadFile = files[0]
 
         e.preventDefault()
-        await this.uploadFileAndEmbedImage(uploadFile);
+        await this.uploadFileAndEmbed(uploadFile)
     }
 
-    private async uploadFileAndEmbedImage(uploadFile: File) {
-        const pasteId = (Math.random() + 1).toString(36).substring(2, 7)
-        const progressText = `![Uploading file... ${pasteId}]()`
-
+    private async uploadFileAndEmbed(uploadFile: File) {
         const editor = this.getEditor();
         if (!editor) {
-            new Notice('⚠️ Please open a file.');
-            return;
+            new Notice('⚠️ Please open a file.')
+            return
         }
+
+        if (!this.uploader) {
+            ObjectManagerPlugin.showUnconfiguredPluginNotice()
+            return
+        }
+
+        const fileIsImage = isImage(uploadFile)
+        // 检测是否只允许上传图片
+        if (this.settings.imageOnly && !fileIsImage) {
+            new Notice('⚠️ Only image allow to upload.')
+            return
+        }
+
+        const fileName = this.genFileName(uploadFile, fileIsImage)
+        const progressText = `![Uploading file...  ${fileName}]()`
+
         editor.replaceSelection(`${progressText}\n`)
 
-        const fileName = this.genImageName(uploadFile);
-        await this.uploader!.uploadFile(fileName, uploadFile);
+        await this.uploader.uploadFile(fileName, uploadFile)
 
-        const { endPoint, port, bucket } = this.settings.minioSettings
-
-        const imageUrl = `http://${endPoint}:${port}/${bucket}/${fileName}`;
-        const markDownImage = `![](${imageUrl})`
-        ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markDownImage)
+        const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
+        const fileUrl = `${useSSL ? "https" : "http"}://${endPoint}:${port}/${bucket}/${fileName}`
+        const markdownText = fileIsImage ? `![](${fileUrl})` : `[${uploadFile.name}](${fileUrl})`
+        
+        ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
     }
 
     private getEditor(): Editor | undefined {
-        return this.app.workspace.activeEditor?.editor;
+        return this.app.workspace.activeEditor?.editor
     }
 
-    private genImageName(image: File) {
-        const parts = image.type.split('/');
-        const type = parts[parts.length - 1];
-        return `${this.settings.minioSettings.namePrefix}${Date.now()}.${type}`;
+    private genFileName(file: File, fileIsImage: boolean) {    
+        const parts = file.name.split(".")
+        if (parts.length >= 2) {
+            const postfix = parts[parts.length - 1]
+            if (fileIsImage) {
+                return `${this.settings.minioSettings.imagePrefix}${Date.now()}.${postfix}`
+            }
+
+            return `${this.settings.minioSettings.filePrefix}${Date.now()}.${postfix}`
+        }
+
+        return `${this.settings.minioSettings.filePrefix}${Date.now()}-${file.name}`
     }
 
     private static showUnconfiguredPluginNotice() {

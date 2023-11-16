@@ -29,7 +29,7 @@ export class MinioUploader implements Uploader {
                 if (err) {
                     reject("Error:" + err.message) 
                 }
-                console.log('Success', objInfo)
+                
                 resolve(fileName)
             })
         })
