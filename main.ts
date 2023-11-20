@@ -95,7 +95,7 @@ export default class ObjectManagerPlugin extends Plugin {
 
         const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
         const fileUrl = `${useSSL ? "https" : "http"}://${endPoint}:${port}/${bucket}/${fileName}`
-        const markdownText = fileIsImage ? `![](${fileUrl})` : `[${uploadFile.name}](${fileUrl})`
+        const markdownText = fileIsImage ? `![](${fileUrl})` : `📄 [${uploadFile.name}](${fileUrl})`
         
         ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
     }
@@ -109,13 +109,13 @@ export default class ObjectManagerPlugin extends Plugin {
         if (parts.length >= 2) {
             const postfix = parts[parts.length - 1]
             if (fileIsImage) {
-                return `${this.settings.minioSettings.imagePrefix}${Date.now()}.${postfix}`
+                return `${this.settings.imagePrefix}${Date.now()}.${postfix}`
             }
 
-            return `${this.settings.minioSettings.filePrefix}${Date.now()}.${postfix}`
+            return `${this.settings.filePrefix}${Date.now()}.${postfix}`
         }
 
-        return `${this.settings.minioSettings.filePrefix}${Date.now()}-${file.name}`
+        return `${this.settings.filePrefix}${Date.now()}-${file.name}`
     }
 
     private static showUnconfiguredPluginNotice() {
