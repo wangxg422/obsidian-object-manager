@@ -12,7 +12,7 @@ export interface minioSettings {
 }
 
 export interface ossSettings {
-  endpoint: string,
+  endPoint: string,
   accessKeyId: string,
   accessSecret: string,
   bucket: string,
@@ -33,7 +33,7 @@ export const DEFAULT_SETTINGS: ObjectManagerSettings = {
     useSSL: false,
   },
   ossSettings: {
-    endpoint: "",
+    endPoint: "",
     accessKeyId: "",
     accessSecret: "",
     bucket: "",
@@ -121,8 +121,8 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
       )
 
     new Setting(commonSettingsEl)
-      .setName("file service")
-      .setDesc("The picture service to save files.")
+      .setName("file storage service")
+      .setDesc("the file service to save files.")
       .addDropdown(dropdown => {
         dropdown
           .addOption("minio", "minio")
@@ -159,7 +159,7 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
       .setDesc("minio server port.")
       .addText(text =>
         text
-          .setPlaceholder("default is 9000")
+          .setPlaceholder("")
           .setValue(this.plugin.settings.minioSettings.port)
           .onChange(async value => {
             this.plugin.settings.minioSettings.port = value
@@ -226,10 +226,10 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
       .setDesc("aliyun oss endpoint.")
       .addText(text =>
         text
-          .setPlaceholder("oss address")
-          .setValue(this.plugin.settings.ossSettings.endpoint)
+          .setPlaceholder("")
+          .setValue(this.plugin.settings.ossSettings.endPoint)
           .onChange(async value => {
-            this.plugin.settings.ossSettings.endpoint = value
+            this.plugin.settings.ossSettings.endPoint = value
             await this.plugin.saveSettings()
           })
       )
@@ -239,7 +239,7 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
       .setDesc("aliyun oss access key id.")
       .addText(text =>
         text
-          .setPlaceholder("oss access key id")
+          .setPlaceholder("")
           .setValue(this.plugin.settings.ossSettings.accessKeyId)
           .onChange(async value => {
             this.plugin.settings.ossSettings.accessKeyId = value
@@ -249,10 +249,10 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("oss secret key")
-      .setDesc("oss access secret.")
+      .setDesc("aliyun oss access secret.")
       .addText(text =>
         text
-          .setPlaceholder("oss access secret")
+          .setPlaceholder("")
           .setValue(this.plugin.settings.ossSettings.accessSecret)
           .onChange(async value => {
             this.plugin.settings.ossSettings.accessSecret = value

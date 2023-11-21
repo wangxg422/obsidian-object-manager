@@ -93,18 +93,31 @@ export default class ObjectManagerPlugin extends Plugin {
 
         await this.uploader.uploadFile(fileName, uploadFile)
 
-        const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
-        const fileUrl = `${useSSL ? "https" : "http"}://${endPoint}:${port}/${bucket}/${fileName}`
-        const markdownText = fileIsImage ? `![](${fileUrl})` : `📄 [${uploadFile.name}](${fileUrl})`
-        
+        const markdownText = this.genMarkdownText(this.settings, fileName, fileIsImage)
         ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
+    }
+
+    private genMarkdownText(settings: ObjectManagerSettings, fileName: string, fileIsImage: boolean): string {
+        let fileUrl = ""
+
+        const { storageService } = settings
+        if (storageService === "minio") {
+            const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
+            fileUrl = `${useSSL ? "https" : "http"}://${endPoint}:${port}/${bucket}/${fileName}`
+        } else if (storageService === "oss") {
+            const { endPoint, bucket } = this.settings.ossSettings
+            const fileUrl = `https://${bucket}.${endPoint}/${fileName}`
+        } else {
+        }
+
+        return fileIsImage ? `![](${fileUrl})` : `📄 [${fileName}](${fileUrl})`
     }
 
     private getEditor(): Editor | undefined {
         return this.app.workspace.activeEditor?.editor
     }
 
-    private genFileName(file: File, fileIsImage: boolean) {    
+    private genFileName(file: File, fileIsImage: boolean) {
         const parts = file.name.split(".")
         if (parts.length >= 2) {
             const postfix = parts[parts.length - 1]
