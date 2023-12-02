@@ -1,4 +1,4 @@
-export function isImage(file: File) {
+export function fileTypeIsImage(file: File) {
     if (!file) {
         return false
     }

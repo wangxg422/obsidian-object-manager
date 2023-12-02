@@ -1,7 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings } from 'settings';
 import { Uploader, buildUploader } from 'uploader/uploader';
-import { isImage } from 'utils/file';
+import { fileTypeIsImage } from 'utils/file';
 import { GetUUID } from 'utils/uuid';
 
 export default class ObjectManagerPlugin extends Plugin {
@@ -80,27 +80,28 @@ export default class ObjectManagerPlugin extends Plugin {
             return
         }
 
-        const fileIsImage = isImage(uploadFile)
+        const fileIsImage = fileTypeIsImage(uploadFile)
         // 检测是否只允许上传图片
         if (this.settings.imageOnly && !fileIsImage) {
             new Notice('⚠️ Only image allow to upload.')
             return
         }
 
-        const fileName = this.genFileName(uploadFile, fileIsImage)
-        const progressText = `![Uploading file...  ${fileName}]()`
+        const originalFileName = uploadFile.name.replace(/\s+/g, "")
+        const storeFileName = this.genFileName(originalFileName, fileIsImage)
+        const progressText = `![Uploading file...  ${storeFileName}]()`
 
         editor.replaceSelection(`${progressText}\n`)
 
-        await this.uploader.uploadFile(fileName, uploadFile)
+        await this.uploader.uploadFile(storeFileName, uploadFile)
 
-        const markdownText = this.genMarkdownText(this.settings, fileName, uploadFile, fileIsImage)
+        const markdownText = this.genMarkdownText(this.settings, storeFileName, originalFileName, fileIsImage)
         ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
     }
 
-    private genMarkdownText(settings: ObjectManagerSettings, fileName: string, file: File, fileIsImage: boolean): string {
+    private genMarkdownText(settings: ObjectManagerSettings, storeFileName: string, originalFileName: string, fileIsImage: boolean): string {
         let fileUrl = ""
-        
+
         const { storageService } = settings
         if (storageService === "minio") {
             const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
@@ -108,27 +109,27 @@ export default class ObjectManagerPlugin extends Plugin {
             if (port === "" || (useSSL && port === "443") || (!useSSL && port === "80")) {
                 urlPort = ""
             } else {
-               urlPort = ":" + port
+                urlPort = ":" + port
             }
 
-            fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${fileName}`
+            fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${storeFileName}`
         } else if (storageService === "oss") {
             const { endPoint, bucket } = this.settings.ossSettings
-            const fileUrl = `https://${bucket}.${endPoint}/${fileName}`
+            const fileUrl = `https://${bucket}.${endPoint}/${storeFileName}`
         } else {
         }
 
-        return fileIsImage ? `![${file.name}](${fileUrl})` : `📄 [${file.name}](${fileUrl})`
+        return fileIsImage ? `![${originalFileName}](${fileUrl})` : `📄 [${originalFileName}](${fileUrl})`
     }
 
     private getEditor(): Editor | undefined {
         return this.app.workspace.activeEditor?.editor
     }
 
-    private genFileName(file: File, fileIsImage: boolean) {
+    private genFileName(originalFileName: string, fileIsImage: boolean) {
         const uuid = GetUUID()
         const time = Date.now()
-        const parts = file.name.split(".")
+        const parts = originalFileName.split(".")
         if (parts.length >= 2) {
             const postfix = parts[parts.length - 1]
             if (fileIsImage) {
@@ -138,7 +139,7 @@ export default class ObjectManagerPlugin extends Plugin {
             return `${postfix}-${uuid}${time}.${postfix}`
         }
 
-        return `${file.name}-${uuid}${time}`
+        return `${originalFileName}-${uuid}${time}`
     }
 
     private static showUnconfiguredPluginNotice() {
