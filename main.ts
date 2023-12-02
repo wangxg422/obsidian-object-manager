@@ -94,11 +94,11 @@ export default class ObjectManagerPlugin extends Plugin {
 
         await this.uploader.uploadFile(fileName, uploadFile)
 
-        const markdownText = this.genMarkdownText(this.settings, fileName, fileIsImage)
+        const markdownText = this.genMarkdownText(this.settings, fileName, uploadFile, fileIsImage)
         ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
     }
 
-    private genMarkdownText(settings: ObjectManagerSettings, fileName: string, fileIsImage: boolean): string {
+    private genMarkdownText(settings: ObjectManagerSettings, fileName: string, file: File, fileIsImage: boolean): string {
         let fileUrl = ""
 
         const { storageService } = settings
@@ -111,7 +111,7 @@ export default class ObjectManagerPlugin extends Plugin {
         } else {
         }
 
-        return fileIsImage ? `![](${fileUrl})` : `📄 [${fileName}](${fileUrl})`
+        return fileIsImage ? `![${file.name}](${fileUrl})` : `📄 [${file.name}](${fileUrl})`
     }
 
     private getEditor(): Editor | undefined {
