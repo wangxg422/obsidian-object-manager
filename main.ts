@@ -100,11 +100,18 @@ export default class ObjectManagerPlugin extends Plugin {
 
     private genMarkdownText(settings: ObjectManagerSettings, fileName: string, file: File, fileIsImage: boolean): string {
         let fileUrl = ""
-
+        
         const { storageService } = settings
         if (storageService === "minio") {
             const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
-            fileUrl = `${useSSL ? "https" : "http"}://${endPoint}:${port}/${bucket}/${fileName}`
+            let urlPort = ""
+            if (port === "" || (useSSL && port === "443") || (!useSSL && port === "80")) {
+                urlPort = ""
+            } else {
+               urlPort = ":" + port
+            }
+
+            fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${fileName}`
         } else if (storageService === "oss") {
             const { endPoint, bucket } = this.settings.ossSettings
             const fileUrl = `https://${bucket}.${endPoint}/${fileName}`
