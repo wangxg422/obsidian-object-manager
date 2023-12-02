@@ -11,6 +11,10 @@ If your plugin does not need CSS, delete this file.
     display: none;
 }
 
-.oss-settings-hide {
+.aliyun-oss-settings-hide {
+    display: none;
+}
+
+.tencent-cos-settings-hide {
     display: none;
 }

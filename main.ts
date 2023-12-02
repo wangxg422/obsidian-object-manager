@@ -1,5 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings } from 'settings';
+import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings } from 'settings/settings';
 import { Uploader, buildUploader } from 'uploader/uploader';
 import { fileTypeIsImage } from 'utils/file';
 import { GetUUID } from 'utils/uuid';
@@ -114,7 +114,7 @@ export default class ObjectManagerPlugin extends Plugin {
 
             fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${storeFileName}`
         } else if (storageService === "oss") {
-            const { endPoint, bucket } = this.settings.ossSettings
+            const { endPoint, bucket } = this.settings.aliyunOssSettings
             const fileUrl = `https://${bucket}.${endPoint}/${storeFileName}`
         } else {
         }
