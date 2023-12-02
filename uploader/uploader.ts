@@ -1,4 +1,4 @@
-import { ObjectManagerSettings } from "settings/settings";
+import { ObjectManagerSettings, storageInfo } from "settings/settings";
 import { MinioUploader } from "./minio-uploader";
 import { TencentCosUploader } from "./tencent-cos-uploader";
 
@@ -9,11 +9,11 @@ export interface Uploader {
 export function buildUploader(settings: ObjectManagerSettings): Uploader | undefined {
     const {storageService} = settings
 
-    if (storageService === "minio") {
+    if (storageService === storageInfo.minio.name) {
         return new MinioUploader(settings.minioSettings);
-    } else if (storageService === "aliyunOss") {
+    } else if (storageService === storageInfo.aliyunOss.name) {
 
-    } else if (storageService === "tencentCos") {
+    } else if (storageService === storageInfo.tencentOss.name) {
         return new TencentCosUploader(settings.tencentCosSettings)
     }
 

@@ -1,5 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings } from 'settings/settings';
+import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings, storageInfo } from 'settings/settings';
 import { Uploader, buildUploader } from 'uploader/uploader';
 import { fileTypeIsImage } from 'utils/file';
 import { GetUUID } from 'utils/uuid';
@@ -103,7 +103,7 @@ export default class ObjectManagerPlugin extends Plugin {
         let fileUrl = ""
 
         const { storageService } = settings
-        if (storageService === "minio") {
+        if (storageService === storageInfo.minio.name) {
             const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
             let urlPort = ""
             if (port === "" || (useSSL && port === "443") || (!useSSL && port === "80")) {
@@ -113,10 +113,12 @@ export default class ObjectManagerPlugin extends Plugin {
             }
 
             fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${storeFileName}`
-        } else if (storageService === "oss") {
+        } else if (storageService === storageInfo.aliyunOss.name) {
             const { endPoint, bucket } = this.settings.aliyunOssSettings
             const fileUrl = `https://${bucket}.${endPoint}/${storeFileName}`
+        } else if (storageService === storageInfo.tencentOss.name){
         } else {
+
         }
 
         return fileIsImage ? `![${originalFileName}](${fileUrl})` : `📄 [${originalFileName}](${fileUrl})`

@@ -65,6 +65,21 @@ export interface ObjectManagerSettings {
   tencentCosSettings: tencentCosSettings,
 }
 
+export const storageInfo = {
+  minio: {
+    name: "minio",
+    hideCls: "minio-settings-hide"
+  },
+  aliyunOss: {
+    name: "aliyunOss",
+    hideCls: "aliyun-oss-settings-hide"
+  },
+  tencentOss: {
+    name: "tencentCos",
+    hideCls: "tencent-cos-settings-hide"
+  }
+}
+
 // 创建插件的自定义配置
 export class ObjectManagerSettingTab extends PluginSettingTab {
   plugin: ObjectManager
@@ -89,13 +104,13 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
 
     const commonSettingsEl = containerEl.createEl("div", { cls: "" })
 
-    const minioSettingsEl = containerEl.createEl("div", { cls: "minio-settings-hide" })
-    const aliyunOssSettingsEl = containerEl.createEl("div", { cls: "aliyun-oss-settings-hide" })
-    const tencentCosSettingsEl = containerEl.createEl("div", { cls: "tencent-cos-settings-hide" })
+    const minioSettingsEl = containerEl.createEl("div", { cls: storageInfo.minio.hideCls })
+    const aliyunOssSettingsEl = containerEl.createEl("div", { cls: storageInfo.minio.hideCls })
+    const tencentCosSettingsEl = containerEl.createEl("div", { cls: storageInfo.tencentOss.hideCls })
 
-    minioSettingsEl.toggleClass("minio-settings-hide", "minio" !== this.plugin.settings.storageService)
-    aliyunOssSettingsEl.toggleClass("aliyun-oss-settings-hide", "aliyunOss" !== this.plugin.settings.storageService)
-    tencentCosSettingsEl.toggleClass("tencent-oss-settings-hide", "tencentCos" !== this.plugin.settings.storageService)
+    minioSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.minio.name !== this.plugin.settings.storageService)
+    aliyunOssSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.aliyunOss.name !== this.plugin.settings.storageService)
+    tencentCosSettingsEl.toggleClass(storageInfo.tencentOss.hideCls, storageInfo.tencentOss.name !== this.plugin.settings.storageService)
 
     renderMinioSettings(minioSettingsEl, this.plugin)
     renderAliyunOssSettings(aliyunOssSettingsEl, this.plugin)
@@ -122,9 +137,9 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
           .addOption("tencentCos", "tencent COS")
           .setValue(this.plugin.settings.storageService)
           .onChange(async value => {
-            minioSettingsEl.toggleClass("minio-settings-hide", "minio" !== value)
-            aliyunOssSettingsEl.toggleClass("aliyun-oss-settings-hide", "aliyunOss" !== value)
-            tencentCosSettingsEl.toggleClass("tencent-cos-settings-hide", "tencentCos" !== value)
+            minioSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.minio.name !== value)
+            aliyunOssSettingsEl.toggleClass(storageInfo.aliyunOss.hideCls, storageInfo.aliyunOss.name !== value)
+            tencentCosSettingsEl.toggleClass(storageInfo.tencentOss.hideCls, storageInfo.tencentOss.name !== value)
 
             this.plugin.settings.storageService = value
             await this.plugin.saveSettings()
