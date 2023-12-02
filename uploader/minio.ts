@@ -24,8 +24,13 @@ export class MinioUploader implements Uploader {
         const client = this.minioClient
         const bucket = this.settings.bucket
 
+        // 指定Content-Type为文件类型，如不指定，则默认为binary/octet-stream，浏览器访问图片时会直接下载
+        const metaData = {
+            'Content-Type': file.type
+        }
+
         return new Promise((resolve, reject) => {
-            client.putObject(bucket, fileName, Buffer.from(content), file.size, function (err, objInfo) {
+            client.putObject(bucket, fileName, Buffer.from(content), file.size, metaData,function (err, objInfo) {
                 if (err) {
                     reject("Error:" + err.message) 
                 }
