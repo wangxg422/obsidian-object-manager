@@ -2,6 +2,7 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings } from 'settings';
 import { Uploader, buildUploader } from 'uploader/uploader';
 import { isImage } from 'utils/file';
+import { GetUUID } from 'utils/uuid';
 
 export default class ObjectManagerPlugin extends Plugin {
     settings: ObjectManagerSettings;
@@ -118,17 +119,19 @@ export default class ObjectManagerPlugin extends Plugin {
     }
 
     private genFileName(file: File, fileIsImage: boolean) {
+        const uuid = GetUUID()
+        const time = Date.now()
         const parts = file.name.split(".")
         if (parts.length >= 2) {
             const postfix = parts[parts.length - 1]
             if (fileIsImage) {
-                return `${this.settings.imagePrefix}${Date.now()}.${postfix}`
+                return `img-${uuid}${time}.${postfix}`
             }
 
-            return `${this.settings.filePrefix}${Date.now()}.${postfix}`
+            return `${postfix}-${uuid}${time}.${postfix}`
         }
 
-        return `${this.settings.filePrefix}${Date.now()}-${file.name}`
+        return `${file.name}-${uuid}${time}`
     }
 
     private static showUnconfiguredPluginNotice() {

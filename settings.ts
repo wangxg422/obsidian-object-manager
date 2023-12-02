@@ -22,14 +22,12 @@ export interface ossSettings {
 export const DEFAULT_SETTINGS: ObjectManagerSettings = {
   imageOnly: false,
   storageService: "minio",
-  imagePrefix: "img-",
-  filePrefix: "file-",
   minioSettings: {
-    endPoint: "192.168.66.10",
-    port: "9000",
-    accessKey: "xishang",
-    secretKey: "xishang",
-    bucket: "mynote",
+    endPoint: "",
+    port: "",
+    accessKey: "",
+    secretKey: "",
+    bucket: "",
     useSSL: false,
   },
   ossSettings: {
@@ -44,8 +42,6 @@ export const DEFAULT_SETTINGS: ObjectManagerSettings = {
 export interface ObjectManagerSettings {
   storageService: string,
   imageOnly: boolean,
-  imagePrefix: string,
-  filePrefix: string,
   minioSettings: minioSettings,
   ossSettings: ossSettings,
 }
@@ -93,32 +89,6 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings()
         })
       })
-
-    new Setting(commonSettingsEl)
-      .setName("image prefix")
-      .setDesc("image file name prefix.")
-      .addText(text =>
-        text
-          .setPlaceholder("")
-          .setValue(this.plugin.settings.imagePrefix)
-          .onChange(async value => {
-            this.plugin.settings.imagePrefix = value
-            await this.plugin.saveSettings()
-          })
-      )
-
-    new Setting(commonSettingsEl)
-      .setName("file prefix")
-      .setDesc("file name prefix if file type is not image.")
-      .addText(text =>
-        text
-          .setPlaceholder("")
-          .setValue(this.plugin.settings.filePrefix)
-          .onChange(async value => {
-            this.plugin.settings.filePrefix = value
-            await this.plugin.saveSettings()
-          })
-      )
 
     new Setting(commonSettingsEl)
       .setName("file storage service")
