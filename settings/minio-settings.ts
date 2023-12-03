@@ -1,5 +1,4 @@
 import { Setting } from "obsidian"
-import { minioSettings } from "./settings"
 import ObjectManager from '../main'
 
 export function renderMinioSettings(containerEl: HTMLElement, plugin: ObjectManager) {

@@ -116,7 +116,10 @@ export default class ObjectManagerPlugin extends Plugin {
         } else if (storageService === storageInfo.aliyunOss.name) {
             const { endPoint, bucket } = this.settings.aliyunOssSettings
             const fileUrl = `https://${bucket}.${endPoint}/${storeFileName}`
-        } else if (storageService === storageInfo.tencentOss.name){
+        } else if (storageService === storageInfo.tencentOss.name) {
+            // https://share-1256198756.cos.ap-beijing.myqcloud.com/xx.png
+            const { bucket, region } = this.settings.tencentCosSettings
+            fileUrl = `https://${bucket}.cos.${region}.myqcloud.com/${storeFileName}`
         } else {
 
         }

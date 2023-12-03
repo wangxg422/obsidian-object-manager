@@ -1,4 +1,3 @@
-import * as stream from "stream";
 import { minioSettings } from "../settings/settings";
 import { Uploader } from "./uploader";
 import { Client } from "minio";

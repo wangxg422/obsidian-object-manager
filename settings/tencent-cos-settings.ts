@@ -1,5 +1,4 @@
 import { Setting } from "obsidian"
-import { tencentCosSettings } from "./settings"
 import ObjectManager from '../main'
 
 export function renderTencentCosSettings(containerEl: HTMLElement, plugin: ObjectManager) {

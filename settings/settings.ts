@@ -1,6 +1,6 @@
 import ObjectManager from '../main'
 
-import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
+import { App, PluginSettingTab, Setting } from 'obsidian'
 import { renderMinioSettings } from './minio-settings'
 import { renderAliyunOssSettings } from './aliyun-oss-settings'
 import { renderTencentCosSettings } from './tencent-cos-settings'
