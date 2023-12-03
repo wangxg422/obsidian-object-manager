@@ -26,6 +26,7 @@ export class AliyunOssUploader implements Uploader {
 
             this.aliyunOssClient.put(fileName, file, options).then(objInfo => {
                 if (objInfo && objInfo.res && objInfo.res.status === 200) {
+                    console.log("file " + fileName + " upload completed")
                     resolve(fileName)
                 } else {
                     reject("Error:" + objInfo)

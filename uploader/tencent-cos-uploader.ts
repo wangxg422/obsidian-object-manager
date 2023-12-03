@@ -39,6 +39,7 @@ export class TencentCosUploader implements Uploader {
                 if (err) {
                     reject("Error:" + err.message)
                 } else {
+                    console.log("file " + fileName + " upload completed")
                     resolve(fileName)
                 }
             })

@@ -34,6 +34,7 @@ export class MinioUploader implements Uploader {
                     reject("Error:" + err.message) 
                 }
                 
+                console.log("file " + fileName + " upload completed")
                 resolve(fileName)
             })
         })

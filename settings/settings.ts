@@ -141,6 +141,8 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
 
             this.plugin.settings.storageService = value
             await this.plugin.saveSettings()
+            // 需要重新加载插件，否则切换文件存储服务时，不会生效
+            await this.plugin.onload()
           })
       })
   }
