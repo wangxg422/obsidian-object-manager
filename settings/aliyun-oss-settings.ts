@@ -4,23 +4,36 @@ import ObjectManager from '../main'
 export function renderAliyunOssSettings(containerEl: HTMLElement, plugin: ObjectManager) {
   const settings = plugin.settings.aliyunOssSettings
 
-  containerEl.createEl("h3", { text: "oss settings" })
+  containerEl.createEl("h3", { text: "aliyun OSS settings" })
 
   new Setting(containerEl)
-    .setName("server endpoint")
-    .setDesc("aliyun oss endpoint.")
+    .setName("bucket")
+    .setDesc("oss bucket name.")
     .addText(text =>
       text
-        .setPlaceholder("")
-        .setValue(settings.endPoint)
+        .setPlaceholder("oss bucket name")
+        .setValue(settings.bucket)
         .onChange(async value => {
-          settings.endPoint = value
+          settings.bucket = value
           await plugin.saveSettings()
         })
     )
 
   new Setting(containerEl)
-    .setName("access key id")
+    .setName("oss bucket region")
+    .setDesc("aliyun oss bucket region.")
+    .addText(text =>
+      text
+        .setPlaceholder("")
+        .setValue(settings.region)
+        .onChange(async value => {
+          settings.region = value
+          await plugin.saveSettings()
+        })
+    )
+
+  new Setting(containerEl)
+    .setName("oss access key id")
     .setDesc("aliyun oss access key id.")
     .addText(text =>
       text
@@ -33,27 +46,14 @@ export function renderAliyunOssSettings(containerEl: HTMLElement, plugin: Object
     )
 
   new Setting(containerEl)
-    .setName("oss secret key")
-    .setDesc("aliyun oss access secret.")
+    .setName("oss access key secret")
+    .setDesc("aliyun oss access key secret.")
     .addText(text =>
       text
         .setPlaceholder("")
-        .setValue(settings.accessSecret)
+        .setValue(settings.accessKeySecret)
         .onChange(async value => {
-          settings.accessSecret = value
-          await plugin.saveSettings()
-        })
-    )
-
-  new Setting(containerEl)
-    .setName("bucket")
-    .setDesc("oss bucket name.")
-    .addText(text =>
-      text
-        .setPlaceholder("oss bucket name")
-        .setValue(settings.bucket)
-        .onChange(async value => {
-          settings.bucket = value
+          settings.accessKeySecret = value
           await plugin.saveSettings()
         })
     )

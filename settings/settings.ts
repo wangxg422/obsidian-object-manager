@@ -15,11 +15,10 @@ export interface minioSettings {
 }
 
 export interface aliyunOssSettings {
-  endPoint: string,
+  region: string,
   accessKeyId: string,
-  accessSecret: string,
+  accessKeySecret: string,
   bucket: string,
-  object: string, //Object完整路径，完整路径中不能包含Bucket名称
 }
 
 export interface tencentCosSettings {
@@ -42,11 +41,10 @@ export const DEFAULT_SETTINGS: ObjectManagerSettings = {
     useSSL: false,
   },
   aliyunOssSettings: {
-    endPoint: "",
+    region: "",
     accessKeyId: "",
-    accessSecret: "",
+    accessKeySecret: "",
     bucket: "",
-    object: ""
   },
   tencentCosSettings: {
     secretId: "",
@@ -105,11 +103,11 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
     const commonSettingsEl = containerEl.createEl("div", { cls: "" })
 
     const minioSettingsEl = containerEl.createEl("div", { cls: storageInfo.minio.hideCls })
-    const aliyunOssSettingsEl = containerEl.createEl("div", { cls: storageInfo.minio.hideCls })
+    const aliyunOssSettingsEl = containerEl.createEl("div", { cls: storageInfo.aliyunOss.hideCls })
     const tencentCosSettingsEl = containerEl.createEl("div", { cls: storageInfo.tencentOss.hideCls })
 
     minioSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.minio.name !== this.plugin.settings.storageService)
-    aliyunOssSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.aliyunOss.name !== this.plugin.settings.storageService)
+    aliyunOssSettingsEl.toggleClass(storageInfo.aliyunOss.hideCls, storageInfo.aliyunOss.name !== this.plugin.settings.storageService)
     tencentCosSettingsEl.toggleClass(storageInfo.tencentOss.hideCls, storageInfo.tencentOss.name !== this.plugin.settings.storageService)
 
     renderMinioSettings(minioSettingsEl, this.plugin)
@@ -129,7 +127,7 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
 
     new Setting(commonSettingsEl)
       .setName("file storage service")
-      .setDesc("the file service to save files.")
+      .setDesc("the file service to store files.")
       .addDropdown(dropdown => {
         dropdown
           .addOption("minio", "minio")

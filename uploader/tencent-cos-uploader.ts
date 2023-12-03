@@ -26,13 +26,10 @@ export class TencentCosUploader implements Uploader {
                 Body: file, /* 必须，上传文件对象，可以是input[type="file"]标签选择本地文件后得到的file对象 */
                 SliceSize: 1024 * 1024 * 5,     /* 触发分块上传的阈值，超过5MB使用分块上传，非必须 */
                 onTaskReady: function(taskId) {                   /* 非必须 */
-                    console.log(taskId);
                 },
                 onProgress: function (progressData) {           /* 非必须 */
-                    console.log(JSON.stringify(progressData));
                 },
                 onFileFinish: function (err, data, options) {   /* 非必须 */
-                   console.log(options.Key + '上传' + (err ? '失败' : '完成'));
                 },
                 // 支持自定义headers 非必须
                 Headers: {

@@ -114,14 +114,14 @@ export default class ObjectManagerPlugin extends Plugin {
 
             fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${storeFileName}`
         } else if (storageService === storageInfo.aliyunOss.name) {
-            const { endPoint, bucket } = this.settings.aliyunOssSettings
-            const fileUrl = `https://${bucket}.${endPoint}/${storeFileName}`
+            // https://xishang-note.oss-cn-beijing.aliyuncs.com/xx.jpg
+            const { bucket,region } = this.settings.aliyunOssSettings
+            fileUrl = `https://${bucket}.oss-cn-${region}.aliyuncs.com/${storeFileName}`
         } else if (storageService === storageInfo.tencentOss.name) {
             // https://share-1256198756.cos.ap-beijing.myqcloud.com/xx.png
             const { bucket, region } = this.settings.tencentCosSettings
             fileUrl = `https://${bucket}.cos.${region}.myqcloud.com/${storeFileName}`
         } else {
-
         }
 
         return fileIsImage ? `![${originalFileName}](${fileUrl})` : `📄 [${originalFileName}](${fileUrl})`
