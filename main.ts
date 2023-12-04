@@ -1,4 +1,4 @@
-import { Editor, Notice, Plugin } from 'obsidian';
+import { Editor, FileSystemAdapter, Notice, Plugin } from 'obsidian';
 import { Uploader, buildUploader } from './uploader/uploader';
 import { ObjectManagerSettings, ObjectManagerSettingTab, DEFAULT_SETTINGS, storageInfo } from './settings/settings';
 import { GetUUID } from './utils/uuid';
@@ -10,13 +10,22 @@ export default class ObjectManagerPlugin extends Plugin {
 
     uploader: Uploader | undefined
 
+    basePath: string
+
     async onload() {
         await this.loadSettings()
 
         // 将插件的配置 tab 添加到设置菜单中
         this.addSettingTab(new ObjectManagerSettingTab(this.app, this))
 
-        this.uploader = buildUploader(this.settings)
+        // 获取当前仓库基础路径
+        const basePath = (
+            this.app.vault.adapter as FileSystemAdapter
+        ).getBasePath()
+
+        this.basePath = basePath
+
+        this.uploader = buildUploader(this.settings, basePath)
 
         // 处理来自剪贴板的黏贴事件
         this.registerEvent(this.app.workspace.on('editor-paste', this.customPasteEventCallback))
@@ -29,7 +38,7 @@ export default class ObjectManagerPlugin extends Plugin {
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
-        this.uploader = buildUploader(this.settings)
+        this.uploader = buildUploader(this.settings, this.basePath)
     }
 
     async saveSettings() {
@@ -105,7 +114,9 @@ export default class ObjectManagerPlugin extends Plugin {
         let fileUrl = ""
 
         const { storageService } = settings
-        if (storageService === storageInfo.minio.name) {
+        if (storageService === storageInfo.local.name) {
+            fileUrl = storeFileName
+        } else if (storageService === storageInfo.minio.name) {
             const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
             let urlPort = ""
             if (port === "" || (useSSL && port === "443") || (!useSSL && port === "80")) {
@@ -117,7 +128,7 @@ export default class ObjectManagerPlugin extends Plugin {
             fileUrl = `${useSSL ? "https" : "http"}://${endPoint}${urlPort}/${bucket}/${storeFileName}`
         } else if (storageService === storageInfo.aliyunOss.name) {
             // https://xishang-note.oss-cn-beijing.aliyuncs.com/xx.jpg
-            const { bucket,region } = this.settings.aliyunOssSettings
+            const { bucket, region } = this.settings.aliyunOssSettings
             fileUrl = `https://${bucket}.oss-cn-${region}.aliyuncs.com/${storeFileName}`
         } else if (storageService === storageInfo.tencentOss.name) {
             // https://share-1256198756.cos.ap-beijing.myqcloud.com/xx.png

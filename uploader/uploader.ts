@@ -8,13 +8,15 @@ export interface Uploader {
     uploadFile(fileName: string, file: File): Promise<string>
 }
 
-export function buildUploader(settings: ObjectManagerSettings): Uploader | undefined {
+export function buildUploader(settings: ObjectManagerSettings, basePath: string): Uploader | undefined {
     const { storageService, localSettings, minioSettings, aliyunOssSettings, tencentCosSettings } = settings
 
     let uploader: Uploader | undefined
 
     if (storageService === storageInfo.local.name) {
-        return new LocalUploader(localSettings)
+        if (basePath) {
+            uploader = new LocalUploader(localSettings, basePath)
+        }
     } else if (storageService === storageInfo.minio.name) {
         if (minioSettings.endPoint && minioSettings.accessKey && minioSettings.secretKey) {
             uploader = new MinioUploader(minioSettings)
