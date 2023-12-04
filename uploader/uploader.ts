@@ -4,19 +4,27 @@ import { TencentCosUploader } from "./tencent-cos-uploader";
 import { AliyunOssUploader } from "./aliyun-oss-uploader";
 
 export interface Uploader {
-    uploadFile(fileName: string, file: File): Promise<string>;
+    uploadFile(fileName: string, file: File): Promise<string>
 }
 
 export function buildUploader(settings: ObjectManagerSettings): Uploader | undefined {
-    const {storageService} = settings
+    const { storageService,minioSettings,aliyunOssSettings,tencentCosSettings } = settings
+
+    let uploader = undefined
 
     if (storageService === storageInfo.minio.name) {
-        return new MinioUploader(settings.minioSettings);
+        if (minioSettings.endPoint && minioSettings.accessKey && minioSettings.secretKey) {
+            uploader = new MinioUploader(settings.minioSettings)
+        }
     } else if (storageService === storageInfo.aliyunOss.name) {
-        return new AliyunOssUploader(settings.aliyunOssSettings)
+        if (aliyunOssSettings.bucket && aliyunOssSettings.accessKeyId && aliyunOssSettings.accessKeySecret) {
+            uploader = new AliyunOssUploader(settings.aliyunOssSettings)
+        }
     } else if (storageService === storageInfo.tencentOss.name) {
-        return new TencentCosUploader(settings.tencentCosSettings)
+        if (tencentCosSettings.bucket && tencentCosSettings.secretId && tencentCosSettings.secretKey) {
+            uploader = new TencentCosUploader(settings.tencentCosSettings)
+        }
     }
 
-    return undefined
+    return uploader
 }

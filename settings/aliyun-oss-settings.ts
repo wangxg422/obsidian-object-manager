@@ -8,10 +8,10 @@ export function renderAliyunOssSettings(containerEl: HTMLElement, plugin: Object
 
   new Setting(containerEl)
     .setName("bucket")
-    .setDesc("oss bucket name.")
+    .setDesc("aliyun OSS bucket name.")
     .addText(text =>
       text
-        .setPlaceholder("oss bucket name")
+        .setPlaceholder("")
         .setValue(settings.bucket)
         .onChange(async value => {
           settings.bucket = value

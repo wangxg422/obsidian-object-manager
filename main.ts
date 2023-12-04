@@ -1,13 +1,13 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Editor, Notice, Plugin } from 'obsidian';
 import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings, storageInfo } from 'settings/settings';
 import { Uploader, buildUploader } from 'uploader/uploader';
 import { fileTypeIsImage } from 'utils/file';
 import { GetUUID } from 'utils/uuid';
 
 export default class ObjectManagerPlugin extends Plugin {
-    settings: ObjectManagerSettings;
+    settings: ObjectManagerSettings
 
-    uploader: Uploader | undefined;
+    uploader: Uploader | undefined
 
     async onload() {
         await this.loadSettings()
@@ -28,6 +28,7 @@ export default class ObjectManagerPlugin extends Plugin {
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
+        this.uploader = buildUploader(this.settings)
     }
 
     async saveSettings() {
@@ -56,7 +57,7 @@ export default class ObjectManagerPlugin extends Plugin {
             return
         }
 
-        const { files } = e.dataTransfer;
+        const { files } = e.dataTransfer
 
         if (!files || files.length == 0) {
             return

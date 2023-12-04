@@ -8,7 +8,7 @@ export function renderTencentCosSettings(containerEl: HTMLElement, plugin: Objec
 
   new Setting(containerEl)
     .setName("access key id")
-    .setDesc("tencent cos access key id.")
+    .setDesc("tencent COS access key id.")
     .addText(text =>
       text
         .setPlaceholder("")
@@ -20,8 +20,8 @@ export function renderTencentCosSettings(containerEl: HTMLElement, plugin: Objec
     )
 
   new Setting(containerEl)
-    .setName("oss secret key")
-    .setDesc("aliyun oss access secret.")
+    .setName("cos access secret")
+    .setDesc("tencent COS access secret.")
     .addText(text =>
       text
         .setPlaceholder("")
@@ -34,10 +34,10 @@ export function renderTencentCosSettings(containerEl: HTMLElement, plugin: Objec
 
   new Setting(containerEl)
     .setName("bucket")
-    .setDesc("cos bucket name.")
+    .setDesc("tencent COS bucket name.")
     .addText(text =>
       text
-        .setPlaceholder("cos bucket name")
+        .setPlaceholder("")
         .setValue(settings.bucket)
         .onChange(async value => {
           settings.bucket = value
@@ -47,10 +47,10 @@ export function renderTencentCosSettings(containerEl: HTMLElement, plugin: Objec
 
   new Setting(containerEl)
     .setName("region")
-    .setDesc("cos bucket region.")
+    .setDesc("tencent COS bucket region.")
     .addText(text =>
       text
-        .setPlaceholder("cos bucket region")
+        .setPlaceholder("")
         .setValue(settings.region)
         .onChange(async value => {
           settings.region = value

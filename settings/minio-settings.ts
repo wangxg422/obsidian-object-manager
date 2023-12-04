@@ -8,10 +8,10 @@ export function renderMinioSettings(containerEl: HTMLElement, plugin: ObjectMana
 
   new Setting(containerEl)
     .setName("server endpoint")
-    .setDesc("The is object manager.")
+    .setDesc("minio server endpoint.")
     .addText(text =>
       text
-        .setPlaceholder("server address")
+        .setPlaceholder("")
         .setValue(settings.endPoint)
         .onChange(async value => {
           settings.endPoint = value
@@ -21,7 +21,7 @@ export function renderMinioSettings(containerEl: HTMLElement, plugin: ObjectMana
 
   new Setting(containerEl)
     .setName("server port")
-    .setDesc("minio server port.")
+    .setDesc("minio server port.the default value is 443 when useSSL is enabled, otherwise it is 80")
     .addText(text =>
       text
         .setPlaceholder("")
