@@ -4,6 +4,11 @@ import { App, PluginSettingTab, Setting } from 'obsidian'
 import { renderMinioSettings } from './minio-settings'
 import { renderAliyunOssSettings } from './aliyun-oss-settings'
 import { renderTencentCosSettings } from './tencent-cos-settings'
+import { renderLocalSettings } from './local-settings'
+
+export interface localSettings {
+  dir: string,
+}
 
 export interface minioSettings {
   endPoint: string,
@@ -32,6 +37,9 @@ export interface tencentCosSettings {
 export const DEFAULT_SETTINGS: ObjectManagerSettings = {
   imageOnly: false,
   storageService: "minio",
+  localSettings: {
+    dir: "attachments"
+  },
   minioSettings: {
     endPoint: "",
     port: "",
@@ -58,12 +66,17 @@ export const DEFAULT_SETTINGS: ObjectManagerSettings = {
 export interface ObjectManagerSettings {
   storageService: string,
   imageOnly: boolean,
+  localSettings: localSettings,
   minioSettings: minioSettings,
   aliyunOssSettings: aliyunOssSettings,
   tencentCosSettings: tencentCosSettings,
 }
 
 export const storageInfo = {
+  local: {
+    name: "local",
+    hideCls: "local-settings-hide"
+  },
   minio: {
     name: "minio",
     hideCls: "minio-settings-hide"
@@ -102,14 +115,17 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
 
     const commonSettingsEl = containerEl.createEl("div", { cls: "" })
 
+    const localSettingsEl = containerEl.createEl("div", { cls: storageInfo.local.hideCls })
     const minioSettingsEl = containerEl.createEl("div", { cls: storageInfo.minio.hideCls })
     const aliyunOssSettingsEl = containerEl.createEl("div", { cls: storageInfo.aliyunOss.hideCls })
     const tencentCosSettingsEl = containerEl.createEl("div", { cls: storageInfo.tencentOss.hideCls })
 
+    localSettingsEl.toggleClass(storageInfo.local.hideCls, storageInfo.local.name !== this.plugin.settings.storageService)
     minioSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.minio.name !== this.plugin.settings.storageService)
     aliyunOssSettingsEl.toggleClass(storageInfo.aliyunOss.hideCls, storageInfo.aliyunOss.name !== this.plugin.settings.storageService)
     tencentCosSettingsEl.toggleClass(storageInfo.tencentOss.hideCls, storageInfo.tencentOss.name !== this.plugin.settings.storageService)
 
+    renderLocalSettings(localSettingsEl, this.plugin)
     renderMinioSettings(minioSettingsEl, this.plugin)
     renderAliyunOssSettings(aliyunOssSettingsEl, this.plugin)
     renderTencentCosSettings(tencentCosSettingsEl, this.plugin)
@@ -130,11 +146,13 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
       .setDesc("the file service to store files.")
       .addDropdown(dropdown => {
         dropdown
+          .addOption("local","local directory")
           .addOption("minio", "minio")
           .addOption("aliyunOss", "aliyun OSS")
           .addOption("tencentCos", "tencent COS")
           .setValue(this.plugin.settings.storageService)
           .onChange(async value => {
+            localSettingsEl.toggleClass(storageInfo.local.hideCls, storageInfo.local.name !== value)
             minioSettingsEl.toggleClass(storageInfo.minio.hideCls, storageInfo.minio.name !== value)
             aliyunOssSettingsEl.toggleClass(storageInfo.aliyunOss.hideCls, storageInfo.aliyunOss.name !== value)
             tencentCosSettingsEl.toggleClass(storageInfo.tencentOss.hideCls, storageInfo.tencentOss.name !== value)
