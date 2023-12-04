@@ -1,8 +1,9 @@
 import { Editor, Notice, Plugin } from 'obsidian';
-import { DEFAULT_SETTINGS, ObjectManagerSettingTab, ObjectManagerSettings, storageInfo } from 'settings/settings';
-import { Uploader, buildUploader } from 'uploader/uploader';
-import { fileTypeIsImage } from 'utils/file';
-import { GetUUID } from 'utils/uuid';
+import { Uploader, buildUploader } from './uploader/uploader';
+import { ObjectManagerSettings, ObjectManagerSettingTab, DEFAULT_SETTINGS, storageInfo } from './settings/settings';
+import { GetUUID } from './utils/uuid';
+import { fileTypeIsImage } from './utils/file';
+
 
 export default class ObjectManagerPlugin extends Plugin {
     settings: ObjectManagerSettings
