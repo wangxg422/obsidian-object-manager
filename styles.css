@@ -7,6 +7,10 @@ If your plugin does not need CSS, delete this file.
 
 */
 
+.local-settings-hide {
+    display: none;
+}
+
 .minio-settings-hide {
     display: none;
 }
