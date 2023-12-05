@@ -39,11 +39,11 @@ export default class ObjectManagerPlugin extends Plugin {
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
-        this.uploader = buildUploader(this.settings, this.basePath)
     }
 
     async saveSettings() {
         await this.saveData(this.settings)
+        this.uploader = buildUploader(this.settings, this.basePath)
     }
 
     private customPasteEventCallback = async (e: ClipboardEvent) => {
