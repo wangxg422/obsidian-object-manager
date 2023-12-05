@@ -3,6 +3,7 @@ import { Uploader, buildUploader } from './uploader/uploader';
 import { ObjectManagerSettings, ObjectManagerSettingTab, DEFAULT_SETTINGS, storageInfo } from './settings/settings';
 import { GetUUID } from './utils/uuid';
 import { fileTypeIsImage } from './utils/file';
+import { getTime } from 'utils/time';
 
 
 export default class ObjectManagerPlugin extends Plugin {
@@ -146,18 +147,18 @@ export default class ObjectManagerPlugin extends Plugin {
 
     private genFileName(originalFileName: string, fileIsImage: boolean) {
         const uuid = GetUUID()
-        const time = Date.now()
+        const time = getTime()
         const parts = originalFileName.split(".")
         if (parts.length >= 2) {
             const postfix = parts[parts.length - 1]
             if (fileIsImage) {
-                return `img-${uuid}${time}.${postfix}`
+                return `img-${time}${uuid}.${postfix}`
             }
 
-            return `${postfix}-${uuid}${time}.${postfix}`
+            return `${postfix}-${time}${uuid}.${postfix}`
         }
 
-        return `${originalFileName}-${uuid}${time}`
+        return `${originalFileName}-${time}${uuid}`
     }
 
     private static showUnconfiguredPluginNotice() {
