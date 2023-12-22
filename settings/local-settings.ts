@@ -7,8 +7,8 @@ export function renderLocalSettings(containerEl: HTMLElement, plugin: ObjectMana
     containerEl.createEl("h3", { text: "local settings" })
 
     new Setting(containerEl)
-        .setName("storage directory")
-        .setDesc("the directory to save files.")
+        .setName("attachment storage directory")
+        .setDesc("relative to the root directory of the vault. eg: accachments.")
         .addText(text =>
             text
                 .setPlaceholder("")
@@ -19,4 +19,14 @@ export function renderLocalSettings(containerEl: HTMLElement, plugin: ObjectMana
                 })
         )
 
+    new Setting(containerEl)
+        .setName("wiki link")
+        .setDesc("use wiki link, otherwise embed markdown format.")
+        .addToggle(t => {
+            t.setValue(settings.wikiLink)
+            t.onChange(async value => {
+                settings.wikiLink = value
+                await plugin.saveSettings()
+            })
+        })
 }

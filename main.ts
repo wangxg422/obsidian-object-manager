@@ -11,8 +11,6 @@ export default class ObjectManagerPlugin extends Plugin {
 
     uploader: Uploader | undefined
 
-    basePath: string
-
     async onload() {
         await this.loadSettings()
 
@@ -24,9 +22,11 @@ export default class ObjectManagerPlugin extends Plugin {
             this.app.vault.adapter as FileSystemAdapter
         ).getBasePath()
 
-        this.basePath = basePath
+        this.settings.vaultSettings = {
+            basePath: basePath
+        }
 
-        this.uploader = buildUploader(this.settings, basePath)
+        this.uploader = buildUploader(this.settings)
 
         // 处理来自剪贴板的黏贴事件
         this.registerEvent(this.app.workspace.on('editor-paste', this.customPasteEventCallback))
@@ -43,7 +43,7 @@ export default class ObjectManagerPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings)
-        this.uploader = buildUploader(this.settings, this.basePath)
+        this.uploader = buildUploader(this.settings)
     }
 
     private customPasteEventCallback = async (e: ClipboardEvent) => {
@@ -80,7 +80,7 @@ export default class ObjectManagerPlugin extends Plugin {
         await this.uploadFileAndEmbed(uploadFile)
     }
 
-    private async uploadFileAndEmbed(uploadFile: File) {
+    private uploadFileAndEmbed(uploadFile: File) {
         const editor = this.getEditor();
         if (!editor) {
             new Notice('⚠️ Please open a file.')
@@ -102,13 +102,18 @@ export default class ObjectManagerPlugin extends Plugin {
         const originalFileName = uploadFile.name.replace(/\s+/g, "")
         const storeFileName = this.genFileName(originalFileName, fileIsImage)
         const progressText = `![Uploading file...  ${storeFileName}]()`
-
         editor.replaceSelection(`${progressText}\n`)
 
-        await this.uploader.uploadFile(storeFileName, uploadFile)
-
         const markdownText = this.genMarkdownText(this.settings, storeFileName, originalFileName, fileIsImage)
-        ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
+
+        this.uploader.uploadFile(storeFileName, uploadFile)
+            .then(() => {
+                ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, markdownText)
+            })
+            .catch(err => {
+                new Notice('⚠️ upload failed.' + err)
+                ObjectManagerPlugin.replaceFirstOccurrence(editor, progressText, "")
+            })
     }
 
     private genMarkdownText(settings: ObjectManagerSettings, storeFileName: string, originalFileName: string, fileIsImage: boolean): string {
@@ -117,6 +122,9 @@ export default class ObjectManagerPlugin extends Plugin {
         const { storageService } = settings
         if (storageService === storageInfo.local.name) {
             fileUrl = storeFileName
+            if(settings.localSettings.wikiLink) {
+                return `![[${fileUrl}]]`
+            }
         } else if (storageService === storageInfo.minio.name) {
             const { endPoint, port, bucket, useSSL } = this.settings.minioSettings
             let urlPort = ""
@@ -138,7 +146,7 @@ export default class ObjectManagerPlugin extends Plugin {
         } else {
         }
 
-        return fileIsImage ? `![${originalFileName}](${fileUrl})` : `📄 [${originalFileName}](${fileUrl})`
+        return fileIsImage ? `![${originalFileName}](${fileUrl})` : `[${originalFileName}](${fileUrl})`
     }
 
     private getEditor(): Editor | undefined {

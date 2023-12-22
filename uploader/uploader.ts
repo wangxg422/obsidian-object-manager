@@ -8,14 +8,14 @@ export interface Uploader {
     uploadFile(fileName: string, file: File): Promise<string>
 }
 
-export function buildUploader(settings: ObjectManagerSettings, basePath: string): Uploader | undefined {
+export function buildUploader(settings: ObjectManagerSettings,): Uploader | undefined {
     const { storageService, localSettings, minioSettings, aliyunOssSettings, tencentCosSettings } = settings
 
     let uploader: Uploader | undefined
 
     if (storageService === storageInfo.local.name) {
-        if (basePath) {
-            uploader = new LocalUploader(localSettings, basePath)
+        if (settings.vaultSettings.basePath) {
+            uploader = new LocalUploader(localSettings, settings.vaultSettings.basePath)
         }
     } else if (storageService === storageInfo.minio.name) {
         if (minioSettings.endPoint && minioSettings.accessKey && minioSettings.secretKey) {

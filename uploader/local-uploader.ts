@@ -8,15 +8,12 @@ export class LocalUploader implements Uploader {
     constructor(settings: localSettings, basePath: string) {
         this.settings = settings
         this.path = `${basePath}/${this.settings.dir}/`
-        // 如果目录不存在，则创建
-        const fs = require('fs')
-        fs.mkdir(this.path, function (err: any) {
-            if (err) {
-            }
-        })
+        this.createDir()
     }
 
     public async uploadFile(fileName: string, file: File): Promise<string> {
+        this.createDir()
+
         const content = await file.arrayBuffer()
 
         return new Promise((resolve, reject) => {
@@ -31,4 +28,15 @@ export class LocalUploader implements Uploader {
         })
     }
 
+    private createDir() {
+        const fs = require('fs')
+
+        if (!fs.existsSync(this.path)) {
+            fs.mkdir(this.path, function (err: any) {
+                if (err) {
+                    console.log(err)
+                }
+            })
+        }
+    }
 }

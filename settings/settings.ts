@@ -6,8 +6,13 @@ import { renderAliyunOssSettings } from './aliyun-oss-settings'
 import { renderTencentCosSettings } from './tencent-cos-settings'
 import { renderLocalSettings } from './local-settings'
 
+export interface vaultSettings {
+  basePath: string,
+}
+
 export interface localSettings {
   dir: string,
+  wikiLink: boolean,
 }
 
 export interface minioSettings {
@@ -35,10 +40,14 @@ export interface tencentCosSettings {
 }
 
 export const DEFAULT_SETTINGS: ObjectManagerSettings = {
+  vaultSettings: {
+    basePath: ""
+  },
   imageOnly: false,
   storageService: "minio",
   localSettings: {
-    dir: "attachments"
+    dir: "attachments",
+    wikiLink: false,
   },
   minioSettings: {
     endPoint: "",
@@ -64,6 +73,7 @@ export const DEFAULT_SETTINGS: ObjectManagerSettings = {
 }
 
 export interface ObjectManagerSettings {
+  vaultSettings: vaultSettings,
   storageService: string,
   imageOnly: boolean,
   localSettings: localSettings,
