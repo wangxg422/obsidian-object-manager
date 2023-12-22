@@ -31,10 +31,10 @@ export class MinioUploader implements Uploader {
         return new Promise((resolve, reject) => {
             client.putObject(bucket, fileName, Buffer.from(content), file.size, metaData,function (err, objInfo) {
                 if (err) {
-                    reject("Error:" + err.message) 
+                    console.log("file " + fileName + " upload failed. " + err)
+                    reject("Error:" + err.message)
                 }
-                
-                console.log("file " + fileName + " upload completed")
+
                 resolve(fileName)
             })
         })
