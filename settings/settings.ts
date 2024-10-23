@@ -76,6 +76,7 @@ export interface ObjectManagerSettings {
   vaultSettings: vaultSettings,
   storageService: string,
   imageOnly: boolean,
+  imageWidth: string,
   localSettings: localSettings,
   minioSettings: minioSettings,
   aliyunOssSettings: aliyunOssSettings,
@@ -150,6 +151,17 @@ export class ObjectManagerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings()
         })
       })
+
+	new Setting(commonSettingsEl)
+    .setName("image width")
+    .setDesc("the default image width,if null,the image width will not set")
+    .addText(t =>
+        t.setValue(this.plugin.settings.imageWidth)
+        .onChange(async value => {
+          this.plugin.settings.imageWidth = value
+          await this.plugin.saveSettings()
+        })
+    )
 
     new Setting(commonSettingsEl)
       .setName("file storage service")

@@ -119,7 +119,7 @@ export default class ObjectManagerPlugin extends Plugin {
     private genMarkdownText(settings: ObjectManagerSettings, storeFileName: string, originalFileName: string, fileIsImage: boolean): string {
         let fileUrl = ""
 
-        const { storageService } = settings
+        const { storageService, imageWidth } = settings
         if (storageService === storageInfo.local.name) {
             fileUrl = storeFileName
             if(settings.localSettings.wikiLink) {
@@ -146,7 +146,11 @@ export default class ObjectManagerPlugin extends Plugin {
         } else {
         }
 
-        return fileIsImage ? `![${originalFileName}](${fileUrl})` : `[${originalFileName}](${fileUrl})`
+		const showImageWidth = imageWidth ? `|${imageWidth}` : ""
+		const filenameWithWidth = `${originalFileName}${showImageWidth}`
+		
+
+        return fileIsImage ? `![${filenameWithWidth}](${fileUrl})` : `[${filenameWithWidth}](${fileUrl})`
     }
 
     private getEditor(): Editor | undefined {
